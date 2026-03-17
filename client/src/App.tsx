@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   CheckCircle, XCircle, Upload, Search, ShieldCheck,
   AlertCircle, Loader2, Activity, ChevronRight, Building2,
