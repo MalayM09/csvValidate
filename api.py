@@ -264,8 +264,12 @@ async def verify_golden(
                     else:
                         comparison[key] = {"status": "match"}
                 
-                display_id = golden.get("POL_ID") or golden.get("policy_no") or "Record"
-                display_name = golden.get("LIFE_ASSURED_NAME") or golden.get("Proposer_Name") or ""
+                display_id = golden.get("POL_ID") or golden.get("policy_no") or golden.get("Policy No") or golden.get("Policy Number") or "Record"
+                first_name = golden.get("Life Assured First Name") or ""
+                last_name = golden.get("Life Assured Last Name") or ""
+                display_name = (golden.get("LIFE_ASSURED_NAME") or golden.get("Proposer_Name") or 
+                                golden.get("Life Assured Name") or golden.get("Name") or 
+                                f"{first_name} {last_name}".strip() or "")
                 
                 results.append({
                     "primary_key": f"{display_name} ({display_id})",
@@ -276,8 +280,12 @@ async def verify_golden(
                 if is_perfect_match:
                     matched_count += 1
             else:
-                display_id = golden.get("POL_ID") or golden.get("policy_no") or "Record"
-                display_name = golden.get("LIFE_ASSURED_NAME") or golden.get("Proposer_Name") or ""
+                display_id = golden.get("POL_ID") or golden.get("policy_no") or golden.get("Policy No") or golden.get("Policy Number") or "Record"
+                first_name = golden.get("Life Assured First Name") or ""
+                last_name = golden.get("Life Assured Last Name") or ""
+                display_name = (golden.get("LIFE_ASSURED_NAME") or golden.get("Proposer_Name") or 
+                                golden.get("Life Assured Name") or golden.get("Name") or 
+                                f"{first_name} {last_name}".strip() or "")
                 results.append({
                     "primary_key": f"{display_name} ({display_id})",
                     "found": False,
