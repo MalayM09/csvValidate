@@ -105,14 +105,12 @@ function App() {
           animate={{ opacity: 1, scale: 1 }}
           className="max-w-4xl w-full"
         >
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold tracking-wide uppercase mb-6">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Select an Option:</span>
-            </div>
-            <h1 className="text-5xl font-black text-slate-900 mb-4 tracking-tight">Select Partner Company</h1>
-            <p className="text-slate-500 text-lg">Choose an insurance provider to begin the Golden Record verification</p>
+          <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold tracking-wide uppercase mb-6">
+            <ShieldCheck className="w-4 h-4" />
+            <span>Term Renewals</span>
           </div>
+          <h1 className="text-5xl font-semibold text-slate-900 mb-4 tracking-tight">Select Company</h1>
+          <p className="text-slate-500 text-lg font-medium">Choose an insurance provider to begin the Golden Record verification</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {COMPANIES.map((company) => (
@@ -133,15 +131,15 @@ function App() {
                     Soon
                   </div>
                 )}
-                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-white text-2xl font-black mb-6 shadow-lg", company.color)}>
+                <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center text-white text-2xl font-semibold mb-6 shadow-lg", company.color)}>
                   {company.icon}
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">{company.name}</h3>
-                <p className="text-slate-400 text-sm leading-relaxed">
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">{company.name}</h3>
+                <p className="text-slate-400 text-sm leading-relaxed font-medium">
                   {company.active ? "" : "Integration pending implementation."}
                 </p>
                 {company.active && (
-                  <div className="mt-6 flex items-center text-blue-600 font-bold text-sm">
+                  <div className="mt-6 flex items-center text-blue-600 font-semibold text-sm">
                     Enter Portal <ChevronRight className="w-4 h-4 ml-1" />
                   </div>
                 )}
@@ -196,16 +194,16 @@ function App() {
 
           <div className="flex flex-col space-y-4 pt-4">
             <div className="flex items-center space-x-3 text-slate-700">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">1</div>
-              <span className="font-medium text-lg">Upload your company CSV</span>
+              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">1</div>
+              <span className="font-semibold text-lg">Upload your company CSV</span>
             </div>
             <div className="flex items-center space-x-3 text-slate-700">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">2</div>
-              <span className="font-medium text-lg">Verify against Golden Set</span>
+              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">2</div>
+              <span className="font-semibold text-lg">Verify against Golden Set</span>
             </div>
             <div className="flex items-center space-x-3 text-slate-700">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">3</div>
-              <span className="font-medium text-lg">Correct and proceed</span>
+              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-semibold text-sm">3</div>
+              <span className="font-semibold text-lg">Correct and proceed</span>
             </div>
           </div>
         </motion.div>
@@ -222,8 +220,8 @@ function App() {
             </div>
 
             <div className="relative z-10">
-              <h2 className="text-3xl font-bold mb-2">Internal Verification Check</h2>
-              <p className="text-slate-400 mb-10">Checking integrity for {COMPANIES.find(c => c.id === selectedCompany)?.name}</p>
+              <h2 className="text-3xl font-semibold mb-2">Internal Verification Check</h2>
+              <p className="text-slate-400 mb-10 font-medium">Checking integrity for {COMPANIES.find(c => c.id === selectedCompany)?.name}</p>
 
               {!results && (
                 <div className="space-y-8">
@@ -237,17 +235,17 @@ function App() {
                     <div className="w-20 h-20 bg-white rounded-3xl shadow-xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 transition-transform pointer-events-none relative z-10">
                       <Upload className="w-10 h-10" />
                     </div>
-                    <p className="text-xl font-bold text-slate-900 pointer-events-none relative z-10 text-center">
+                    <p className="text-xl font-semibold text-slate-900 pointer-events-none relative z-10 text-center">
                       {file ? file.name : `Drop ${COMPANIES.find(c => c.id === selectedCompany)?.name} CSV`}
                     </p>
-                    <p className="text-sm text-slate-400 mt-2 pointer-events-none relative z-10">Maximum file size: 10MB</p>
+                    <p className="text-sm text-slate-400 mt-2 font-medium pointer-events-none relative z-10">Maximum file size: 10MB</p>
                   </div>
 
                   <Button
                     onClick={startVerification}
                     fullWidth
                     disabled={!file || loading}
-                    className="py-6 text-lg font-black bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200 rounded-2xl"
+                    className="py-6 text-lg font-semibold bg-blue-600 hover:bg-blue-700 shadow-xl shadow-blue-200 rounded-2xl"
                   >
                     {loading ? (
                       <>
@@ -265,8 +263,8 @@ function App() {
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
                   <div className="flex items-center justify-between bg-slate-900 text-white p-6 rounded-3xl shadow-lg">
                     <div>
-                      <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Status Report</p>
-                      <h3 className="text-xl font-bold">{summary}</h3>
+                      <p className="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-1">Status Report</p>
+                      <h3 className="text-xl font-semibold">{summary}</h3>
                     </div>
                     <Button onClick={() => setResults(null)} variant="ghost" className="text-white hover:bg-white/10">Clean Slate</Button>
                   </div>
@@ -283,8 +281,8 @@ function App() {
                               {!r.found ? <Search className="w-6 h-6" /> : (r.is_valid ? <CheckCircle className="w-6 h-6" /> : <XCircle className="w-6 h-6" />)}
                             </div>
                             <div>
-                              <h4 className="font-bold text-slate-900">{r.primary_key}</h4>
-                              <p className="text-xs text-slate-500">
+                              <h4 className="font-semibold text-slate-900">{r.primary_key}</h4>
+                              <p className="text-xs text-slate-500 font-medium">
                                 {r.is_valid ? "Correct data - Proceed" : (r.found ? "Incorrect data detected" : "Record missing from CSV")}
                               </p>
                             </div>
@@ -295,16 +293,16 @@ function App() {
                           <div className="mt-6 pt-6 border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4">
                             {Object.entries(r.details).map(([key, val]) => (
                               val.status === 'mismatch' && (
-                                <div key={key} className="flex flex-col space-y-2 p-3 bg-white rounded-xl border border-red-100 shadow-sm">
-                                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">{key}</span>
+                                <div key={key} className="flex flex-col space-y-2 p-3 bg-white rounded-xl border border-red-100 shadow-sm font-medium">
+                                  <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">{key}</span>
                                   <div className="flex items-center justify-between">
                                     <div className="flex flex-col">
-                                      <span className="text-[10px] text-gray-400 font-bold">Golden Record</span>
+                                      <span className="text-[10px] text-gray-400 font-semibold">Golden Record</span>
                                       <span className="text-xs font-medium text-slate-900">{val.expected || "(Empty)"}</span>
                                     </div>
                                     <div className="flex flex-col items-end">
-                                      <span className="text-[10px] text-red-500 font-bold">Uploaded CSV</span>
-                                      <span className="text-xs font-black text-red-600">{val.actual || "(Empty)"}</span>
+                                      <span className="text-[10px] text-red-500 font-semibold">Uploaded CSV</span>
+                                      <span className="text-xs font-semibold text-red-600">{val.actual || "(Empty)"}</span>
                                     </div>
                                   </div>
                                 </div>
@@ -313,7 +311,7 @@ function App() {
                           </div>
                         )}
                         {r.error && (
-                          <p className="mt-4 text-xs font-bold text-amber-600 flex items-center">
+                          <p className="mt-4 text-xs font-semibold text-amber-600 flex items-center">
                             <AlertCircle className="w-4 h-4 mr-1" /> {r.error}
                           </p>
                         )}
