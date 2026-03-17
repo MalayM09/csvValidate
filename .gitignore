@@ -1,0 +1,6 @@
+venv/
+token.pickle
+.DS_Store
+__pycache__/
+client/node_modules/
+client/dist/
