@@ -43,7 +43,6 @@ function App() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<VerificationResult[] | null>(null);
-  const [summary, setSummary] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -261,12 +260,20 @@ function App() {
 
               {results && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
-                  <div className="flex items-center justify-between bg-slate-900 text-white p-6 rounded-3xl shadow-lg">
+                  <div className={cn(
+                    "flex items-center justify-between p-6 rounded-3xl shadow-lg transition-all duration-500",
+                    results.every(r => r.found && r.is_valid) ? "bg-green-600 text-white" : "bg-red-600 text-white"
+                  )}>
                     <div>
-                      <p className="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-1">Status Report</p>
-                      <h3 className="text-xl font-semibold">{summary}</h3>
+                      <p className={cn(
+                        "text-xs font-semibold uppercase tracking-widest mb-1",
+                        results.every(r => r.found && r.is_valid) ? "text-green-100" : "text-red-100"
+                      )}>Status Report</p>
+                      <h3 className="text-xl font-semibold">
+                        {results.every(r => r.found && r.is_valid) ? "Approved: All Records Match" : "Fatal Warning: Data Mismatch"}
+                      </h3>
                     </div>
-                    <Button onClick={() => setResults(null)} variant="ghost" className="text-white hover:bg-white/10">Clean Slate</Button>
+                    <Button onClick={() => setResults(null)} variant="ghost" className="text-white hover:bg-white/10 border-white/20">Clean Slate</Button>
                   </div>
 
                   <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
@@ -326,7 +333,8 @@ function App() {
                     ))}
                   </div>
                 </div>
-              )}
+              )
+              }
 
               {error && (
                 <div className="mt-8 p-5 bg-red-50 text-red-700 rounded-[24px] text-sm flex items-start space-x-3 border border-red-100 border-l-4">
