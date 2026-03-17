@@ -10,11 +10,11 @@ services:
         value: 3.10.0
 
   # Frontend React service
-  - type: static_site
+  - type: web
     name: validator-frontend
     env: static
     buildCommand: cd client && npm install && npm run build
-    publishPath: client/dist
+    staticPublishPath: client/dist
     envVars:
       - key: VITE_API_URL
         fromService:
