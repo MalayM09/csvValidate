@@ -189,8 +189,10 @@ async def verify_golden(
         def normalize(val):
             if pd.isna(val) or str(val).strip() == "":
                 return ""
-            s = str(val).strip().lower()
+            # Strip, lowercase, and collapse multiple spaces
+            s = " ".join(str(val).strip().lower().split())
             try:
+                # Handle numeric values (e.g., 0 vs 0.0)
                 f = float(s)
                 if f == int(f):
                     return str(int(f))
