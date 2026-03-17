@@ -4,3 +4,4 @@ token.pickle
 __pycache__/
 client/node_modules/
 client/dist/
+credentials.json
