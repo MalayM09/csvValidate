@@ -14,7 +14,7 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE = ''; // Relative to the same domain on Vercel
 
 interface VerificationDetail {
   status: 'match' | 'mismatch';
