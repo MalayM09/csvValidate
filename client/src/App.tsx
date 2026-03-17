@@ -35,7 +35,7 @@ const COMPANIES = [
   { id: 'tata', name: 'Tata Life Insurance', icon: 'T', color: 'bg-teal-600', active: true },
   { id: 'hdfc', name: 'HDFC Life', icon: 'H', color: 'bg-red-600', active: true },
   { id: 'icici', name: 'ICICI Prudential', icon: 'I', color: 'bg-orange-600', active: false },
-  { id: 'bajaj', name: 'Bajaj Allianz', icon: 'B', color: 'bg-yellow-600', active: false },
+  { id: 'bajaj', name: 'Bajaj Allianz', icon: 'B', color: 'bg-yellow-600', active: true },
 ];
 
 function App() {

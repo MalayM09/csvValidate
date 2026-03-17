@@ -130,6 +130,29 @@ GOLDEN_DATA = {
                 "SRC": "MUM_LA", "Login Date": "05/05/2023", "Application No": "1271000033137", "Policy No": "26053719", "Proposal Date": "27/04/2023", "Proposal Receive Date": "27/04/2023", "First Receipt Date": "27/04/2023", "Original Commensement Date": "05/05/2023", "Conversion Date": "05/05/2023", "Premium Due Date": "05/05/2026", "Lapsed Date": "-", "Maturity Date": "05/05/2053", "Grace Period Ends": "04/06/2026", "Product Name": "HDFC Life Click2 Protect Life", "Policy Term": "30", "Premium Paying Term": "30", "Premium Amount": "30,348", "PREMIUM_AMT_WITH_TAX": "30348", "COMBI_PREMIUM_AMT": "0", "COMBI_PREMIUM_AMT_WITH_TAX": "35811", "EXTERNAL_OPTION": "-", "Sum Assured": "32000000", "Policy Status": "In Force", "Reason Desc": "-", "Withdrawn Reason": "-", "Premium Paying Mode": "01", "Renewal Collection Method": "Cash / Cheques", "SI Flag": "Non AutoDebit", "Policy Flag": "POLICY", "Client Name": "Saravanan I", "Life Assured Name": "Saravanan I", "Email ID": "saravanancse13@gmail.com"
             }
         ]
+    },
+    "bajaj": {
+        "keys": ["Policy Number", "Name", "Email"],
+        "records": [
+            {
+                "Policy Number": "625315564", "Name": "TAKKILGE DATTATRI", "BOOKING_FREQUENCY": "1", "Benefit Term": "40", "Premium Term": "15", "Full Term Premium": "14746.83", "Annulized": "14746.83", "Agent Code": "2000050532", "Package Code": "LIFE_SHEILD_NEW", "CHANGE_DESCRIPTION": "ISSUED", "Term Start Date": "15/05/2025", "PAYMENT_DUE_DATE": "15/05/2026", "Appln No": "6136735274", "Renewal Mode": "NACH", "Pay Mode": "UPI", "Email": "dattatri.7585@gmail.com"
+            },
+            {
+                "Policy Number": "603619411", "Name": "RAJAN V", "BOOKING_FREQUENCY": "1", "Benefit Term": "35", "Premium Term": "10", "Full Term Premium": "36909", "Annulized": "36909", "Agent Code": "2000050532", "Package Code": "LIFE_SHEILD_NEW", "CHANGE_DESCRIPTION": "ISSUED", "Term Start Date": "21/08/2024", "PAYMENT_DUE_DATE": "21/08/2026", "Appln No": "6135019604", "Renewal Mode": "NACH", "Pay Mode": "DCOL", "Email": "vrajan1988@gmail.com"
+            },
+            {
+                "Policy Number": "622472245", "Name": "GANESH CHINNI", "BOOKING_FREQUENCY": "12", "Benefit Term": "39", "Premium Term": "10", "Full Term Premium": "4877", "Annulized": "58524", "Agent Code": "2000050532", "Package Code": "LIFE_SHEILD_NEW", "CHANGE_DESCRIPTION": "ISSUED", "Term Start Date": "11/04/2025", "PAYMENT_DUE_DATE": "11/03/2026", "Appln No": "6136537610", "Renewal Mode": "UPI_M", "Pay Mode": "UPI", "Email": "chinnig6@gmail.com"
+            },
+            {
+                "Policy Number": "612839938", "Name": "NARAYANARAOPET SOWMYA", "BOOKING_FREQUENCY": "12", "Benefit Term": "50", "Premium Term": "20", "Full Term Premium": "2320", "Annulized": "27840", "Agent Code": "2000050532", "Package Code": "LIFE_SHEILD_PLUS_NEW", "CHANGE_DESCRIPTION": "ISSUED", "Term Start Date": "23/12/2024", "PAYMENT_DUE_DATE": "23/03/2026", "Appln No": "6135850483", "Renewal Mode": "NACH", "Pay Mode": "UPI", "Email": "narayanraopet.sowmya@gmail.com"
+            },
+            {
+                "Policy Number": "636456186", "Name": "SURJEET RAWAT", "BOOKING_FREQUENCY": "1", "Benefit Term": "24", "Premium Term": "24", "Full Term Premium": "11655", "Annulized": "11655", "Agent Code": "2000050532", "Package Code": "LIFE_SHEILD_NEW", "CHANGE_DESCRIPTION": "ISSUED", "Term Start Date": "18/08/2025", "PAYMENT_DUE_DATE": "18/08/2026", "Appln No": "6166176514", "Renewal Mode": "NACH", "Pay Mode": "UPI", "Email": "jeetrawat5@gmail.com"
+            },
+            {
+                "Policy Number": "634209876", "Name": "ABHILASH SATHIAN", "BOOKING_FREQUENCY": "12", "Benefit Term": "30", "Premium Term": "30", "Full Term Premium": "2146", "Annulized": "25752", "Agent Code": "2000050532", "Package Code": "LIFE_SHEILD_NEW", "CHANGE_DESCRIPTION": "ISSUED", "Term Start Date": "26/07/2025", "PAYMENT_DUE_DATE": "26/03/2026", "Appln No": "6137263179", "Renewal Mode": "NACH", "Pay Mode": "UPI", "Email": "abhilash_2011@yahoo.com"
+            }
+        ]
     }
 }
 
