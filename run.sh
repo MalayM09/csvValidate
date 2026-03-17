@@ -14,7 +14,8 @@ echo "Starting Google Sheet Validator Services..."
 
 # Start Backend
 source venv/bin/activate
-python api.py &
+export PYTHONPATH=$PYTHONPATH:.
+python api/index.py &
 BACKEND_PID=$!
 echo "Backend started on http://localhost:8000 (PID: $BACKEND_PID)"
 
