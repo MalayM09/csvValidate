@@ -1,0 +1,23 @@
+services:
+  # Backend FastAPI service
+  - type: web
+    name: validator-backend
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn api:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.0
+
+  # Frontend React service
+  - type: static
+    name: validator-frontend
+    env: static
+    buildCommand: cd client && npm install && npm run build
+    publishPath: client/dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: validator-backend
+          property: host
