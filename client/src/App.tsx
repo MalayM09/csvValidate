@@ -64,7 +64,6 @@ function App() {
       formData.append('company', selectedCompany);
       const resp = await axios.post(`${API_BASE}/api/verify-golden`, formData);
       setResults(resp.data.results);
-      setSummary(resp.data.summary);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Verification failed. Please check your CSV format.');
     } finally {
