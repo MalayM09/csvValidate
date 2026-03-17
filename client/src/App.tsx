@@ -283,11 +283,18 @@ function App() {
                             <div>
                               <h4 className="font-semibold text-slate-900">{r.primary_key}</h4>
                               <p className="text-xs text-slate-500 font-medium">
-                                {r.is_valid ? "Correct data - Proceed" : (r.found ? "Incorrect data detected" : "Record missing from CSV")}
+                                {r.is_valid ? "Correct data - Proceed" : (r.found ? "Data Incorrect" : "Record missing from CSV")}
                               </p>
                             </div>
                           </div>
                         </div>
+
+                        {!r.is_valid && r.found && (
+                          <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl flex items-center space-x-2 text-red-700">
+                            <AlertCircle className="w-4 h-4 shrink-0" />
+                            <span className="text-xs font-semibold">Critical data discrepancy found. Please review the highlighted fields below.</span>
+                          </div>
+                        )}
 
                         {!r.is_valid && r.details && (
                           <div className="mt-6 pt-6 border-t border-slate-200 grid grid-cols-1 md:grid-cols-2 gap-4">
