@@ -80,6 +80,22 @@ function App() {
     setSelectedCompany(null);
   };
 
+  // Browser back button support
+  React.useEffect(() => {
+    const handlePopState = () => {
+      if (selectedCompany) {
+        setSelectedCompany(null);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [selectedCompany]);
+
+  const handleSelectCompany = (id: string) => {
+    window.history.pushState({ company: id }, '');
+    setSelectedCompany(id);
+  };
+
   // --- Landing Page View ---
   if (!selectedCompany) {
     return (
@@ -92,7 +108,7 @@ function App() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center space-x-2 px-4 py-1.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold tracking-wide uppercase mb-6">
               <ShieldCheck className="w-4 h-4" />
-              <span>Enterprise Data Auditor</span>
+              <span>Select an Option:</span>
             </div>
             <h1 className="text-5xl font-black text-slate-900 mb-4 tracking-tight">Select Partner Company</h1>
             <p className="text-slate-500 text-lg">Choose an insurance provider to begin the Golden Record verification</p>
@@ -104,7 +120,7 @@ function App() {
                 key={company.id}
                 whileHover={company.active ? { y: -5, scale: 1.02 } : {}}
                 whileTap={company.active ? { scale: 0.98 } : {}}
-                onClick={() => company.active && setSelectedCompany(company.id)}
+                onClick={() => company.active && handleSelectCompany(company.id)}
                 className={cn(
                   "relative p-8 rounded-[32px] border-2 transition-all text-left overflow-hidden",
                   company.active
@@ -122,7 +138,7 @@ function App() {
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{company.name}</h3>
                 <p className="text-slate-400 text-sm leading-relaxed">
-                  {company.active ? "Full Golden Record audit available." : "Integration pending implementation."}
+                  {company.active ? "" : "Integration pending implementation."}
                 </p>
                 {company.active && (
                   <div className="mt-6 flex items-center text-blue-600 font-bold text-sm">
@@ -170,12 +186,12 @@ function App() {
           </div>
 
           <h1 className="text-5xl md:text-6xl font-black tracking-tight text-slate-900 leading-[1.1]">
-            Golden Record <br />
+            Record <br />
             <span className="text-blue-600">Verification.</span>
           </h1>
 
           <p className="text-slate-500 text-xl leading-relaxed max-w-lg">
-            Ensure your policy data strictly adheres to the authoritative golden entries for {COMPANIES.find(c => c.id === selectedCompany)?.name}.
+            Ensure your policy data strictly adheres to the authoritative golden entries.
           </p>
 
           <div className="flex flex-col space-y-4 pt-4">
