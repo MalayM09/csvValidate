@@ -80,8 +80,15 @@ async def verify_golden(file: UploadFile = File(...)):
     
     try:
         content = await file.read()
-        df = pd.read_csv(io.BytesIO(content)).convert_dtypes()
+        # Robust CSV reading: Try comma then tab
+        try:
+            df = pd.read_csv(io.BytesIO(content), sep=None, engine='python').convert_dtypes()
+        except:
+            df = pd.read_csv(io.BytesIO(content)).convert_dtypes()
+            
+        # Clean columns: strip and lowercase for discovery
         df.columns = df.columns.str.strip()
+        col_map = {c.lower(): c for c in df.columns}
         
         if df.empty:
             raise HTTPException(status_code=400, detail="CSV file is empty")
@@ -90,22 +97,39 @@ async def verify_golden(file: UploadFile = File(...)):
         def normalize(val):
             if pd.isna(val) or str(val).strip() == "":
                 return ""
-            return str(val).strip().lower()
+            s = str(val).strip().lower()
+            # Handle numeric strings (e.g. "0" vs "0.0")
+            try:
+                f = float(s)
+                # If it's a whole number, treat as integer string
+                if f == int(f):
+                    return str(int(f))
+                return str(f)
+            except (ValueError, TypeError):
+                return s
 
         results = []
         matched_count = 0
         
+        # Primary Key Column Names (Case-Insensitive check)
+        key_name = col_map.get("life_assured_name")
+        key_id = col_map.get("pol_id")
+        key_email = col_map.get("email_id")
+
+        if not all([key_name, key_id, key_email]):
+            missing = [k for k, v in {"LIFE_ASSURED_NAME": key_name, "POL_ID": key_id, "EMAIL_ID": key_email}.items() if not v]
+            raise HTTPException(status_code=400, detail=f"Required columns missing in CSV: {', '.join(missing)}")
+
         for golden in GOLDEN_RECORDS:
-            # Composite Key: Name, POL_ID, Email
             target_name = normalize(golden["LIFE_ASSURED_NAME"])
             target_id = normalize(golden["POL_ID"])
             target_email = normalize(golden["EMAIL_ID"])
             
-            # Find in uploaded CSV
+            # Find in uploaded CSV using normalized comparison
             match = df[
-                (df["LIFE_ASSURED_NAME"].apply(normalize) == target_name) &
-                (df["POL_ID"].astype(str).apply(normalize) == target_id) &
-                (df["EMAIL_ID"].apply(normalize) == target_email)
+                (df[key_name].apply(normalize) == target_name) &
+                (df[key_id].astype(str).apply(normalize) == target_id) &
+                (df[key_email].apply(normalize) == target_email)
             ]
             
             if not match.empty:
@@ -115,7 +139,10 @@ async def verify_golden(file: UploadFile = File(...)):
                 
                 # Compare all fields in the Golden Record
                 for key, expected_val in golden.items():
-                    actual_val = csv_row.get(key, "")
+                    # Find matching column in CSV (case-insensitive)
+                    csv_col = col_map.get(key.lower())
+                    actual_val = csv_row.get(csv_col, "") if csv_col else ""
+                    
                     if normalize(actual_val) != normalize(expected_val):
                         comparison[key] = {
                             "status": "mismatch",
@@ -147,6 +174,8 @@ async def verify_golden(file: UploadFile = File(...)):
             "summary": f"{matched_count}/{len(GOLDEN_RECORDS)} Golden Records matched perfectly"
         }
         
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing CSV: {str(e)}")
 
