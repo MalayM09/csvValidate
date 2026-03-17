@@ -10,7 +10,7 @@ services:
         value: 3.10.0
 
   # Frontend React service
-  - type: static
+  - type: static_site
     name: validator-frontend
     env: static
     buildCommand: cd client && npm install && npm run build
