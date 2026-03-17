@@ -255,7 +255,7 @@ function App() {
                         Analyzing Records...
                       </>
                     ) : (
-                      "Run Compliance Verification"
+                      "Check"
                     )}
                   </Button>
                 </div>
