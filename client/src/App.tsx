@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle, Search, Sheet, Mail, User, AlertCircle, Loader2 } from 'lucide-react';
+import { CheckCircle, XCircle, Upload, Search, Sheet, Mail, User, AlertCircle, Loader2, Table, RefreshCw } from 'lucide-react';
 import { Button } from './components/Button';
-import { Input } from './components/Input';
-import { Select } from './components/Select';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -14,68 +12,56 @@ function cn(...inputs: ClassValue[]) {
 
 const API_BASE = 'http://localhost:8000';
 
-interface SheetInfo {
-  sheet_name: string;
-  columns: string[];
-  row_count: number;
-}
-
-interface ValidationResult {
-  valid: boolean;
-  column_name: string;
-  column_value: string;
-  name: string | null;
-  email: string | null;
-  is_name_present: boolean;
-  is_email_present: boolean;
+interface ValidationBatchResult {
+  csv_row: Record<string, any>;
+  sheet_row: Record<string, any> | null;
+  matches: Record<string, boolean>;
+  is_valid: boolean;
+  name_present: boolean;
+  email_present: boolean;
+  error?: string;
 }
 
 function App() {
-  const [sheetId, setSheetId] = useState('');
-  const [sheetInfo, setSheetInfo] = useState<SheetInfo | null>(null);
-  const [lookupColumn, setLookupColumn] = useState('POL_ID');
-  const [lookupValue, setLookupValue] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [samples, setSamples] = useState<Record<string, any>[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [validating, setValidating] = useState(false);
-  const [result, setResult] = useState<ValidationResult | null>(null);
+  const [results, setResults] = useState<ValidationBatchResult[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSheetInfo = async () => {
-    if (!sheetId) return;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
+      setError(null);
+      setSamples(null);
+      setResults(null);
+    }
+  };
+
+  const uploadCSV = async () => {
+    if (!file) return;
     setLoading(true);
     setError(null);
-    setSheetInfo(null);
     try {
-      const resp = await axios.get(`${API_BASE}/api/sheet-info`, {
-        params: { sheet_id: sheetId }
-      });
-      setSheetInfo(resp.data);
-      if (resp.data.columns.includes('POL_ID')) {
-        setLookupColumn('POL_ID');
-      } else if (resp.data.columns.length > 0) {
-        setLookupColumn(resp.data.columns[0]);
-      }
+      const formData = new FormData();
+      formData.append('file', file);
+      const resp = await axios.post(`${API_BASE}/api/upload-csv`, formData);
+      setSamples(resp.data.samples);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Failed to fetch sheet info. Check your Sheet ID and credentials.');
+      setError(err.response?.data?.detail || 'Failed to process CSV');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleValidate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!sheetId || !lookupValue) return;
-
+  const validateBatch = async () => {
+    if (!samples) return;
     setValidating(true);
     setError(null);
-    setResult(null);
     try {
-      const resp = await axios.post(`${API_BASE}/api/validate`, {
-        sheet_id: sheetId,
-        column_name: lookupColumn,
-        column_value: lookupValue
-      });
-      setResult(resp.data);
+      const resp = await axios.post(`${API_BASE}/api/validate-batch`, samples);
+      setResults(resp.data.results);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Validation failed');
     } finally {
@@ -83,192 +69,184 @@ function App() {
     }
   };
 
+  const reset = () => {
+    setFile(null);
+    setSamples(null);
+    setResults(null);
+    setError(null);
+  };
+
   return (
     <div className="min-h-screen bg-white text-[#212529] font-['Inter'] flex items-center justify-center p-6 md:p-12 lg:p-20 overflow-x-hidden">
-      <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+      <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
 
         {/* Left Column: Content */}
         <motion.div
           initial={{ opacity: 0, x: -30 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex flex-col space-y-8"
+          className="flex flex-col space-y-8 sticky top-20"
         >
-          <div className="inline-flex items-center space-x-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold tracking-wide uppercase">
-            <CheckCircle className="w-3 h-3" />
-            <span>Smart Validator</span>
+          <div className="inline-flex items-center space-x-2 px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-xs font-bold tracking-wide uppercase">
+            <RefreshCw className="w-3 h-3" />
+            <span>Batch Cross-Check</span>
           </div>
 
           <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight text-[#212529] leading-[1.05]">
-            Validate policy data <br />
-            <span className="text-blue-600">in seconds.</span>
+            Compare CSV with <br />
+            <span className="text-blue-600">Google Sheets.</span>
           </h1>
 
           <p className="text-[#868E96] text-xl leading-relaxed max-w-lg">
-            Connect your Google Sheet and instantly verify if critical fields like names and emails are present for any policy record.
+            Upload your CSV and we'll randomly sample 5-6 entries to cross-check against the Master Sheet in real-time.
           </p>
 
-          <div className="flex items-center space-x-6 pt-4">
-            <div className="flex -space-x-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="w-12 h-12 rounded-full border-4 border-white bg-gray-100 flex items-center justify-center overflow-hidden">
-                  <img src={`https://i.pravatar.cc/150?u=${i + 10}`} alt="User" />
-                </div>
-              ))}
+          <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100 flex items-center space-x-4">
+            <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
+              <Sheet className="w-6 h-6" />
             </div>
-            <p className="text-sm text-gray-500 font-medium">
-              Trusted by 500+ <br /> support teams
-            </p>
-          </div>
-
-          <div className="relative h-48 w-full max-w-md rounded-3xl overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center border border-blue-100/50">
-            <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-            <Sheet className="w-20 h-20 text-blue-200/50" />
+            <div>
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">Target Sheet</p>
+              <p className="text-sm font-bold text-gray-700">1bMd0xDug...RZnHI</p>
+            </div>
           </div>
         </motion.div>
 
-        {/* Right Column: Form */}
+        {/* Right Column: Workflow */}
         <motion.div
           initial={{ opacity: 0, x: 30 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="relative"
+          className="relative w-full"
         >
-          <div className="absolute -top-20 -right-20 w-64 h-64 bg-blue-100 rounded-full blur-3xl opacity-50 z-0"></div>
+          <div className="bg-white rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.06)] border border-gray-100 p-8 md:p-10 w-full relative z-10">
 
-          <div className="bg-white rounded-[32px] shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-gray-100 p-8 md:p-10 w-full max-w-lg mx-auto relative z-10 backdrop-blur-sm bg-white/95">
-            <h2 className="text-2xl font-bold mb-8 text-[#212529] flex items-center">
-              Entry Verification
-            </h2>
-
-            <form onSubmit={handleValidate} className="space-y-6">
-              <div className="flex space-x-3 items-end">
-                <Input
-                  label="Google Sheet ID"
-                  placeholder="Paste Sheet ID here..."
-                  value={sheetId}
-                  onChange={(e) => setSheetId(e.target.value)}
-                  className="flex-1"
-                />
+            {/* Step 1: Upload */}
+            {!samples && (
+              <div className="space-y-8">
+                <h2 className="text-2xl font-bold">Step 1: Upload CSV</h2>
+                <div className="relative border-2 border-dashed border-gray-200 rounded-[24px] p-12 flex flex-col items-center justify-center hover:border-blue-400 transition-colors bg-gray-50/50">
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileChange}
+                    className="absolute inset-0 opacity-0 cursor-pointer"
+                  />
+                  <Upload className="w-12 h-12 text-blue-500 mb-4" />
+                  <p className="text-lg font-bold text-gray-700">
+                    {file ? file.name : "Choose CSV File"}
+                  </p>
+                  <p className="text-sm text-gray-400 mt-1">or drag and drop here</p>
+                </div>
                 <Button
-                  type="button"
-                  onClick={fetchSheetInfo}
-                  variant="outline"
-                  disabled={loading || !sheetId}
-                  className="mb-0.5"
+                  onClick={uploadCSV}
+                  fullWidth
+                  disabled={!file || loading}
+                  className="py-4 text-base font-bold"
                 >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Connect"}
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Process & Sample Entries"}
                 </Button>
               </div>
+            )}
 
-              <AnimatePresence>
-                {sheetInfo && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="space-y-6 overflow-hidden"
-                  >
-                    <div className="grid grid-cols-2 gap-4">
-                      <Select
-                        label="Lookup Column"
-                        value={lookupColumn}
-                        onChange={(e) => setLookupColumn(e.target.value)}
-                        options={sheetInfo.columns.map(c => ({ label: c, value: c }))}
-                      />
-                      <Input
-                        label="Value to Find"
-                        placeholder="e.g. 32662.3"
-                        value={lookupValue}
-                        onChange={(e) => setLookupValue(e.target.value)}
-                      />
-                    </div>
-
-                    <Button
-                      type="submit"
-                      variant="primary"
-                      fullWidth
-                      disabled={validating || !lookupValue}
-                      className="py-4 text-base font-bold"
-                    >
-                      {validating ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Search className="w-5 h-5 mr-2" />}
-                      Check Entry
-                    </Button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {!sheetInfo && !loading && !error && (
-                <div className="py-12 border-2 border-dashed border-gray-100 rounded-2xl flex flex-col items-center justify-center text-gray-400">
-                  <Sheet className="w-10 h-10 mb-2 opacity-20" />
-                  <p className="text-sm font-medium">Connect a sheet to start</p>
+            {/* Step 2: Sampling */}
+            {samples && !results && (
+              <div className="space-y-8">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold">Step 2: Sampled Entries</h2>
+                  <Button onClick={reset} variant="ghost" className="text-xs">Reset</Button>
                 </div>
-              )}
+                <p className="text-sm text-gray-500">We've picked {samples.length} random entries. Ready to cross-check?</p>
 
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="p-4 bg-red-50 text-red-600 rounded-2xl text-sm flex items-start space-x-3 border border-red-100"
-                >
-                  <AlertCircle className="w-5 h-5 shrink-0" />
-                  <span>{error}</span>
-                </motion.div>
-              )}
-            </form>
-
-            <AnimatePresence>
-              {result && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  className={cn(
-                    "mt-10 p-6 rounded-3xl border transition-all duration-300",
-                    result.valid ? "bg-green-50 border-green-100" : "bg-red-50 border-red-100"
-                  )}
-                >
-                  <div className="flex items-center justify-between mb-6">
-                    <h3 className={cn("text-lg font-bold", result.valid ? "text-green-700" : "text-red-700")}>
-                      {result.valid ? "Valid Record" : "Incomplete Record"}
-                    </h3>
-                    {result.valid ?
-                      <CheckCircle className="w-8 h-8 text-green-500" /> :
-                      <XCircle className="w-8 h-8 text-red-500" />
-                    }
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="bg-white/60 backdrop-blur-sm p-4 rounded-2xl flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <User className="w-5 h-5 text-gray-400" />
-                        <span className="text-sm font-medium text-gray-700">Name present?</span>
+                <div className="space-y-4">
+                  {samples.map((s, idx) => (
+                    <div key={idx} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 flex items-center justify-between">
+                      <div className="flex flex-col">
+                        <span className="text-xs font-bold text-gray-400">POL_ID</span>
+                        <span className="text-sm font-bold text-gray-800">{s.POL_ID || "N/A"}</span>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm font-bold text-gray-900">{result.name || "None"}</span>
-                        {result.is_name_present ?
-                          <CheckCircle className="w-4 h-4 text-green-500" /> :
-                          <XCircle className="w-4 h-4 text-red-500" />
-                        }
+                      <div className="flex flex-col items-end">
+                        <span className="text-xs font-bold text-gray-400">Name</span>
+                        <span className="text-sm text-gray-600 truncate max-w-[150px]">{s.LIFE_ASSURED_NAME || "N/A"}</span>
                       </div>
                     </div>
+                  ))}
+                </div>
 
-                    <div className="bg-white/60 backdrop-blur-sm p-4 rounded-2xl flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <Mail className="w-5 h-5 text-gray-400" />
-                        <span className="text-sm font-medium text-gray-700">Email present?</span>
+                <Button
+                  onClick={validateBatch}
+                  fullWidth
+                  disabled={validating}
+                  className="py-4 text-base font-bold bg-[#FF8255] hover:bg-orange-600"
+                >
+                  {validating ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : <Search className="w-5 h-5 mr-2" />}
+                  Cross-Check with Sheet
+                </Button>
+              </div>
+            )}
+
+            {/* Step 3: Results */}
+            {results && (
+              <div className="space-y-8">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-2xl font-bold">Cross-Check Report</h2>
+                  <Button onClick={reset} variant="ghost" className="text-xs">Start New Upload</Button>
+                </div>
+
+                <div className="space-y-6 max-h-[600px] overflow-y-auto pr-2">
+                  {results.map((r, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      className={cn(
+                        "p-6 rounded-3xl border",
+                        r.is_valid ? "bg-green-50 border-green-100" : "bg-red-50 border-red-100"
+                      )}
+                    >
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-lg font-bold text-gray-800">POL-ID: {r.csv_row.POL_ID}</span>
+                        </div>
+                        {r.is_valid ? <CheckCircle className="text-green-500" /> : <XCircle className="text-red-500" />}
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="text-sm font-bold text-gray-900 truncate max-w-[150px]">{result.email || "None"}</span>
-                        {result.is_email_present ?
-                          <CheckCircle className="w-4 h-4 text-green-500" /> :
-                          <XCircle className="w-4 h-4 text-red-500" />
-                        }
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+
+                      {r.error ? (
+                        <p className="text-xs text-red-600 font-medium">Error: {r.error}</p>
+                      ) : (
+                        <div className="grid grid-cols-1 gap-3 text-xs">
+                          <div className={cn("flex justify-between p-2 rounded-xl bg-white/60", !r.name_present && "text-red-600 font-bold")}>
+                            <span>Name Presence</span>
+                            <span>{r.name_present ? "✅ Present" : "❌ Missing"}</span>
+                          </div>
+                          <div className={cn("flex justify-between p-2 rounded-xl bg-white/60", !r.email_present && "text-red-600 font-bold")}>
+                            <span>Email Presence</span>
+                            <span>{r.email_present ? "✅ Present" : "❌ Missing"}</span>
+                          </div>
+                          <div className="flex justify-between p-2 rounded-xl bg-white/60">
+                            <span>Data Match (CSV vs Sheet)</span>
+                            <span className={cn("font-bold", r.is_valid ? "text-green-600" : "text-red-600")}>
+                              {Object.values(r.matches).filter(m => !m).length === 0 ? "Full Match" : "Mismatch Found"}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="mt-6 p-4 bg-red-50 text-red-600 rounded-2xl text-sm flex items-start space-x-3 border border-red-100"
+              >
+                <AlertCircle className="w-5 h-5 shrink-0" />
+                <span>{error}</span>
+              </motion.div>
+            )}
+
           </div>
         </motion.div>
       </div>
