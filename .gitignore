@@ -2,6 +2,8 @@ venv/
 token.pickle
 .DS_Store
 __pycache__/
+*.pyc
 client/node_modules/
 client/dist/
 credentials.json
+.vercel/
